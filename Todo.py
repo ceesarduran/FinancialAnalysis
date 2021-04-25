@@ -31,7 +31,22 @@ import plotly.graph_objects as go
 
 
 
-stocks = ["SPY","AAPL" ,"RCL", "AAL" ,"MARA","GE","KO", "AMZN","AMD","TSLA","MELI"]#,"sp500"]
+
+
+stocks = ["AAPL" ,"RCL", "AAL" ,"MARA","GE","KO", "AMZN","AMD","TSLA","MELI","^GSPC"]
+#stocks = []
+
+#def Stock_Analysis():
+ #   print("Introduzca la cantidad de acciones a Analizar:")
+ #   n = input()
+ #   for i in range(n):
+ #       print(i") ")
+ #       s = input()
+ #       stocks.append(s)
+ #   print(stocks)
+ #   return stocks
+
+#stocks.append("^GSPC")
 #tart = datetime.datetime(2016,1,1)
 #end = datetime.datetime(2021,4,11)
 data = yf.download(stocks, period= "5y", interval = "1d", groupby = stocks)
@@ -153,7 +168,7 @@ testa.plot(x = "Date" , y = stocks)
 plt.grid()
 plt.xlabel("Date")
 plt.ylabel("Adjusted")
-plt.title("Miscrosoft Price data")
+plt.title("Stocks Price data")
 #plt.style.use('dark_background')
 print("---Plot graph finish---")
 plt.ioff()
@@ -210,11 +225,11 @@ pprint(charlie["AAPL"])
 pprint("sssssssssssssssssssssssssssssssssssssssss")
 #pprint(charlie["RCL"])
 #plt.scatter( x = charlie["Adj Close"]["RCL"], y = charlie["Adj Close"]["AAL"]);
-charlie.plot(kind = 'scatter', x = 'SPY', y = 'AAPL')
+charlie.plot(kind = 'scatter', x = '^GSPC', y = 'AAPL')
 plt.grid()
 plt.show()
 
-beta, alpha = np.polyfit(charlie['SPY'], stocks_daily_return['AAPL'], 1)
+beta, alpha = np.polyfit(charlie['^GSPC'], stocks_daily_return['AAPL'], 1)
 print('Beta for {} stock is = {} and alpha is = {}'.format('AAPL', beta, alpha))
 
 #charlie.plot(kind = 'scatter', x = 'SPY', y = 'AAPL')
@@ -222,16 +237,16 @@ print('Beta for {} stock is = {} and alpha is = {}'.format('AAPL', beta, alpha))
 # Straight line equation with alpha and beta parameters 
 # Straight line equation is y = beta * rm + alpha
 #charlie.plot(charlie['SPY'], beta * charlie['SPY'] + alpha, '-', color = 'r')
-charlie.plot(kind = 'scatter', x = 'SPY', y = 'AAPL')
-plt.plot(charlie['SPY'], beta * charlie['SPY'] + alpha, '-', color = 'r')
+charlie.plot(kind = 'scatter', x = '^GSPC', y = 'AAPL')
+plt.plot(charlie['^GSPC'], beta * charlie['^GSPC'] + alpha, '-', color = 'r')
 
 plt.grid()
 plt.show()
 
 
-print("Promedio de SPY: {}" .format(charlie["SPY"].mean()))
+print("Promedio de SP500 {}" .format(charlie["^GSPC"].mean()))
 
-rm = charlie["SPY"].mean() * 252
+rm = charlie["^GSPC"].mean() * 252
 
 
 print("Promedio de Retorno anual: {}" .format(rm))
@@ -242,3 +257,51 @@ ER_AAPL = rf + (beta*(rm-rf))
 
 print("Return of Apple: {}" .format(ER_AAPL ))
 #plt.scatter
+
+def interactive_plot(df, title):
+    fig = px.line(title = title)
+    for i in df.columns[1:]:
+        fig.add_scatter(x = df['Date'], y = df[i], name = i)
+    fig.show()
+    
+interactive_plot(df2, "Interactive")
+interactive_plot(testa, "Interactive Normalized")
+
+beta = {}
+alpha = {}
+
+# Loop on every stock daily return
+for i in stocks_daily_return.columns:
+
+  # Ignoring the date and S&P500 Columns 
+  if i != 'Date' and i != '^GSPC':
+    # plot a scatter plot between each individual stock and the S&P500 (Market)
+    stocks_daily_return.plot(kind = 'scatter', x = '^GSPC', y = i)
+    
+    # Fit a polynomial between each stock and the S&P500 (Poly with order = 1 is a straight line)
+    b, a = np.polyfit(stocks_daily_return['^GSPC'], stocks_daily_return[i], 1)
+    
+    plt.plot(stocks_daily_return['^GSPC'], b * stocks_daily_return['^GSPC'] + a, '-', color = 'r')
+    plt.title("{}/SP500".format(i))
+    beta[i] = b
+    
+    alpha[i] = a
+    
+    plt.show()
+pprint(beta)
+pprint(alpha)
+ER = {}
+
+new_stocks = list(beta.keys())
+
+for i in new_stocks:
+    ER[i] = rf + (beta[i]*(rm-rf))
+    print("Valor de Retorno Esperado para {} es: {}". format(i,ER[i]))
+    
+portfolio_weights = 1/10 * np.ones(10) 
+pprint(portfolio_weights)
+
+ER_portfolio = sum(list(ER.values()) * portfolio_weights)
+ER_portfolio
+
+print('Expected Return Based on CAPM for the portfolio is {}%\n'.format(ER_portfolio))
