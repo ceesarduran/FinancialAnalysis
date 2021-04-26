@@ -76,9 +76,7 @@ def daily_return(df):
 stocks_daily_return = daily_return(df2)
 stocks_daily_return.to_excel("Daily_Return.xlsx")
 
-#stocks_daily_return.plot(kind = 'scatter' , x = '^GSPC', y = 'AAPL')
-#plt.grid()
-#plt.show()
+
 
 beta, alpha = np.polyfit(stocks_daily_return['^GSPC'], stocks_daily_return['AAPL'], 1)
 print('Beta for {} stock is = {} and alpha is = {}'.format('AAPL', beta, alpha))
