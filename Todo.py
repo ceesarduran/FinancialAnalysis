@@ -33,7 +33,7 @@ import plotly.graph_objects as go
 
 
 
-stocks = ["AAPL" ,"RCL", "AAL" ,"MARA","GE","KO", "AMZN","AMD","TSLA","MELI","^GSPC"]
+stocks = ["AAPL" ,"RCL", "AAL" ,"MARA","GE","KO", "AMZN","AMD","TSLA","MELI", "EXPO","^GSPC"]
 
 
 
@@ -61,7 +61,7 @@ dfnormalized = normalize(df2)
 
 dfnormalized.to_excel("NormalizedStocks.xlsx")
 
-interactive_plot(df2, "StockData")
+#interactive_plot(df2, "StockData")
 interactive_plot(dfnormalized, "StockData_Normalized")
 
 
@@ -139,24 +139,24 @@ for i in new_stocks:
     ER[i] = rf + (beta[i]*(rm-rf))
     print("Valor de Retorno Esperado para {} es: {}".format(i,ER[i]))
     
-portfolio_weights = 1/10 * np.ones(10) 
-pprint(portfolio_weights)
+portfolio_weights = 1/11 * np.ones(11)
+#pprint(portfolio_weights)
 
 ER_portfolio = sum(list(ER.values()) * portfolio_weights)
 ER_portfolio
 
 print('Expected Return Based on CAPM for the portfolio is {}%\n'.format(ER_portfolio))
 
-for i in stocks_daily_return.columns:
+#for i in stocks_daily_return.columns:
       
-  if i != 'Date' and i != '^GSPC':
+#  if i != 'Date' and i != '^GSPC':
     
     # Use plotly express to plot the scatter plot for every stock vs. the S&P500
-    fig = px.scatter(stocks_daily_return, x = '^GSPC', y = i, title = i)
+#    fig = px.scatter(stocks_daily_return, x = '^GSPC', y = i, title = i)
 
     # Fit a straight line to the data and obtain beta and alpha
-    b, a = np.polyfit(stocks_daily_return['^GSPC'], stocks_daily_return[i], 1)
+#    b, a = np.polyfit(stocks_daily_return['^GSPC'], stocks_daily_return[i], 1)
     
     # Plot the straight line 
-    fig.add_scatter(x = stocks_daily_return['^GSPC'], y = b*stocks_daily_return['^GSPC'] + a)
-    fig.show()
+#    fig.add_scatter(x = stocks_daily_return['^GSPC'], y = b*stocks_daily_return['^GSPC'] + a)
+#    fig.show()
